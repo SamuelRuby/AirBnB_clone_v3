@@ -26,20 +26,17 @@ class BaseModel:
         created_at = Column(DateTime, default=datetime.utcnow)
         updated_at = Column(DateTime, default=datetime.utcnow)
 
-#look here if error
     def __init__(self, *args, **kwargs):
         """Initialization of the base model"""
         if kwargs:
             for key, value in kwargs.items():
                 if key != "__class__":
                     setattr(self, key, value)
-            if kwargs.get("created_at", None) and\
-                    isinstance(self.updated_at, str):
+            if kwargs.get("created_at", None) and type(self.created_at) is str:
                 self.created_at = datetime.strptime(kwargs["created_at"], time)
             else:
                 self.created_at = datetime.utcnow()
-            if kwargs.get("updated_at", None) and\
-                    isinstance(self.updated_at, str):
+            if kwargs.get("updated_at", None) and type(self.updated_at) is str:
                 self.updated_at = datetime.strptime(kwargs["updated_at"], time)
             else:
                 self.updated_at = datetime.utcnow()
@@ -58,12 +55,10 @@ class BaseModel:
     def save(self):
         """updates the attribute 'updated_at' with the current datetime"""
         self.updated_at = datetime.utcnow()
-        if self.__class__.__name__ == 'User':
-            self.hash_password()
         models.storage.new(self)
         models.storage.save()
 
-    def to_dict(self, save=False):
+    def to_dict(self):
         """returns a dictionary containing all keys/values of the instance"""
         new_dict = self.__dict__.copy()
         if "created_at" in new_dict:
